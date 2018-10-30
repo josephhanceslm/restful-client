@@ -6,6 +6,15 @@
 
 (enable-console-print!)
 
+(def proxy-url
+  "http://localhost:4000/post")
+
+(def remote-url-local
+  "http://10.0.0.15/solar_api/v1/GetInverterRealtimeData.cgi?Scope=System")
+
+(def remote-url-internet
+  "http://x.x.x.x/solar_api/v1/GetInverterRealtimeData.cgi?Scope=System")
+
 (println "This text is printed from src/restful-client/core.cljs. Go ahead and edit it and see reloading in action.")
 
 ;; define your app data so that it doesn't get over-written on reload
@@ -39,12 +48,14 @@
   (swap! app-state assoc :response response))))
 
 (defn hello-world []
-[:div
- [:h1 (:text @app-state)]
- [:h2 "Current: " (-> (:response @app-state) :body :Body :Data :PAC :Values :1)
- [:span " W"]]
- [:h2 "Today: " (-> (:response @app-state) :body :Body :Data :DAY_ENERGY :Values :1)
- [:span " Wh"]]
+[:div {:class "container"}
+ ;[:h1 (:text @app-state)]
+ [:div {:class "shadowbox_top"}]
+ [:div {:class "shadowbox_content"} "Now: " (/ (-> (:response @app-state) :body :Body :Data :PAC :Values :1) 1000)
+ [:span " kW"]]
+ [:div {:class "shadowbox_content"} "Day: " (/ (-> (:response @app-state) :body :Body :Data :DAY_ENERGY :Values :1) 1000)
+ [:span " kWh"]]
+ [:div {:class "shadowbox_bottom"}]
 ])
 
 (reagent/render-component [hello-world]
@@ -56,9 +67,8 @@
 ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
 
-;(call-web-service-get "http://localhost:3000")
 (defn update-values []
-  (call-web-service-post "http://localhost:3000/post" "http://10.0.0.15/solar_api/v1/GetInverterRealtimeData.cgi?Scope=System"))
+  (call-web-service-post proxy-url remote-url-internet))
 
 (defonce interval (atom 0))
 
